@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Net;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
 namespace Madden18RevealAutomator
@@ -23,11 +24,14 @@ namespace Madden18RevealAutomator
                 "https://www.muthead.com/18/players/reveal/");
             WebResponse response = request.GetResponse();
 
-            var lastPartofUrl = response.ResponseUri.AbsolutePath.Split('/')[4];
+            var uriSplit = response.ResponseUri.AbsoluteUri.Split('/');
+            var lastPartofUrl = uriSplit[4];
             Stream dataStream = response.GetResponseStream();
             StreamReader reader = new StreamReader(dataStream);
             string responseFromServer = reader.ReadToEnd();
-            var sub = responseFromServer.Substring(1900, 65);
+            var subb = Regex.Match(responseFromServer, @"<title>(.*?)</title>");
+            var splitsub = subb.ToString().Substring(7, subb.Length - 16).Split('-');
+            var sub = splitsub[2].Substring(0, 8) + splitsub[0];
 
             if (sub.Contains("Elite"))
             {
@@ -36,18 +40,12 @@ namespace Madden18RevealAutomator
                     var contains = sub.Contains(i + " OVR");
                     if (contains)
                     {
-                        if (MessageBox.Show(string.Format(
-                                @"Congratulations!  You found {0}{0}{1}{0}{0} https://www.muthead.com/18/players/reveal/" +
-                                lastPartofUrl, Environment.NewLine, sub, MessageBoxButtons.YesNo,
-                                MessageBoxIcon.Asterisk)) == DialogResult.Yes)
-                        {
-                            System.Diagnostics.Process.Start("https://www.muthead.com/18/players/reveal/" +
-                                                             lastPartofUrl);
-                        }
+                        MessageBox.Show(string.Format(
+                            @"Congratulations!  You found {0}{0}{1}{0}{0} https://www.muthead.com/18/players/reveal/" +
+                            lastPartofUrl, Environment.NewLine, sub));
                     }
                 }
             }
-            
         }
     }
 }
