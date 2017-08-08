@@ -8,41 +8,53 @@ namespace Madden18RevealAutomator
 {
     class Program
     {
+        //this no longer works because the reveal page is gone!  Should be good for Madden 19 tho :)
         private static void Main(string[] args)
         {
             int count = 0;
             while (true)
             {
                 count++;
-                DoWork();
+                CheckForElites();
             }
         }
 
-        public static void DoWork()
+        public static void CheckForElites()
         {
+            //make request
             WebRequest request = WebRequest.Create(
                 "https://www.muthead.com/18/players/reveal/");
             WebResponse response = request.GetResponse();
 
-            var uriSplit = response.ResponseUri.AbsoluteUri.Split('/');
-            var lastPartofUrl = uriSplit[4];
+            //split url
+            string[] uriSplit = response.ResponseUri.AbsoluteUri.Split('/');
+
+            //get last section of URL
+            string lastPartofUrl = uriSplit[4];
+
+            //read HTML
             Stream dataStream = response.GetResponseStream();
             StreamReader reader = new StreamReader(dataStream);
             string responseFromServer = reader.ReadToEnd();
-            var subb = Regex.Match(responseFromServer, @"<title>(.*?)</title>");
-            var splitsub = subb.ToString().Substring(7, subb.Length - 16).Split('-');
-            var sub = splitsub[2].Substring(0, 8) + splitsub[0];
 
-            if (sub.Contains("Elite"))
+            //check for matches
+            var match = Regex.Match(responseFromServer, @"<title>(.*?)</title>");
+            
+            //at least they're 80 OVR...
+            if (match.ToString().Contains("Elite"))
             {
+                //create substring in "99 OVR - Player name" format
+                var splitMatch = match.ToString().Substring(7, match.Length - 16).Split('-');
+                var OVRandName = splitMatch[2].Substring(0, 8) + splitMatch[0];
+
                 for (int i = 90; i < 99; i++)
                 {
-                    var contains = sub.Contains(i + " OVR");
+                    var contains = OVRandName.Contains(i + " OVR");
                     if (contains)
                     {
                         MessageBox.Show(string.Format(
                             @"Congratulations!  You found {0}{0}{1}{0}{0} https://www.muthead.com/18/players/reveal/" +
-                            lastPartofUrl, Environment.NewLine, sub));
+                            lastPartofUrl, Environment.NewLine, OVRandName));
                     }
                 }
             }
