@@ -19,6 +19,10 @@ namespace Madden18RevealAutomator
             }
         }
 
+        /// <summary>
+        /// WebRequest used to keep requesting reveal page, getting new page everytime.  Looks for certain attribues in title of page.  
+        /// MessageBox appears if player of desired overall is found.
+        /// </summary>
         public static void CheckForElites()
         {
             //make request
