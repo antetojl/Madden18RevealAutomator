@@ -11,10 +11,8 @@ namespace Madden18RevealAutomator
         //this no longer works because the reveal page is gone!  Should be good for Madden 19 tho :)
         private static void Main(string[] args)
         {
-            int count = 0;
             while (true)
             {
-                count++;
                 CheckForElites();
             }
         }
@@ -27,14 +25,14 @@ namespace Madden18RevealAutomator
         {
             //make request
             WebRequest request = WebRequest.Create(
-                "https://www.muthead.com/18/players/reveal/");
+                "https://www.muthead.com/reveal/");
             WebResponse response = request.GetResponse();
 
             //split url
             string[] uriSplit = response.ResponseUri.AbsoluteUri.Split('/');
 
             //get last section of URL
-            string lastPartofUrl = uriSplit[4];
+            string lastPartofUrl = uriSplit[6];
 
             //read HTML
             Stream dataStream = response.GetResponseStream();
@@ -51,13 +49,13 @@ namespace Madden18RevealAutomator
                 var splitMatch = match.ToString().Substring(7, match.Length - 16).Split('-');
                 var OVRandName = splitMatch[2].Substring(0, 8) + splitMatch[0];
 
-                for (int i = 90; i < 99; i++)
+                for (int i = 89; i < 99; i++)
                 {
                     var contains = OVRandName.Contains(i + " OVR");
                     if (contains)
                     {
                         MessageBox.Show(string.Format(
-                            @"Congratulations!  You found {0}{0}{1}{0}{0} https://www.muthead.com/18/players/reveal/" +
+                            @"Congratulations!  You found {0}{0}{1}{0}{0} https://www.muthead.com/reveal/" +
                             lastPartofUrl, Environment.NewLine, OVRandName));
                     }
                 }
